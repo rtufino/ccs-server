@@ -1,5 +1,35 @@
-from app import db
-from sqlalchemy.exc import SQLAlchemyError
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+#  Copyright (C) Lisoft & AV Electronics - All Rights Reserved
+#  Unauthorized copying of this file, via any medium is strictly prohibited
+#  Proprietary and confidential
+#  Written by Rodrigo Tufiño <rtufino@lisoft.net>, December 2019
+
+"""
+    Módulo con los modelos y administración de la base de datos
+"""
+
+from os import environ
+
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+app = Flask(__name__)
+
+# Configuraciones
+app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Variables
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 
 class Banco(db.Model):
@@ -8,21 +38,9 @@ class Banco(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(64), nullable=False, unique=True)
     estado = db.Column(db.Integer, nullable=False, default=1)
-    # sucursales = db.relationship('Sucursal', backref='banco', lazy=True)
-    # tipos_cajas = db.relationship('TipoCaja', backref='banco', lazy=True)
 
     def __repr__(self):
         return f'<Banco {self.nombre}>'
-
-    def save(self):
-        try:
-            if not self.id:
-                db.session.add(self)
-            db.session.commit()
-        except SQLAlchemyError as e:
-            print(str(e.__dict__['orig']))
-            return False
-        return True
 
     @staticmethod
     def get_by_id(id):
@@ -37,18 +55,6 @@ class Sucursal(db.Model):
     direccion = db.Column(db.Text, nullable=True)
     telefono = db.Column(db.Text, nullable=True)
     estado = db.Column(db.Integer, nullable=False, default=1)
-    # cajas = db.relationship('Caja', backref='sucursal', lazy=True)
-    # hub = db.relationship('Hub', backref='sucursal', lazy=True, uselist=False)
-
-    def save(self):
-        try:
-            if not self.id:
-                db.session.add(self)
-            db.session.commit()
-        except SQLAlchemyError as e:
-            print(str(e.__dict__['orig']))
-            return False
-        return True
 
 
 class TipoCaja(db.Model):
@@ -58,17 +64,6 @@ class TipoCaja(db.Model):
     banco = db.Column(db.Integer, db.ForeignKey('banco.id'), nullable=False)
     nombre = db.Column(db.String(64), nullable=False)
     estado = db.Column(db.Integer, nullable=False, default=1)
-    #cajas = db.relationship('Caja', backref='tipo_caja', lazy=True)
-
-    def save(self):
-        try:
-            if not self.id:
-                db.session.add(self)
-            db.session.commit()
-        except SQLAlchemyError as e:
-            print(str(e.__dict__['orig']))
-            return False
-        return True
 
 
 class Caja(db.Model):
@@ -82,21 +77,18 @@ class Caja(db.Model):
     direccion = db.Column(db.String(3), nullable=False)
     audio = db.Column(db.String(16), nullable=False)
     estado = db.Column(db.Integer, nullable=False, default=1)
-    # registros = db.relationship('Registro', backref='caja', lazy=True)
-
-    def save(self):
-        try:
-            if not self.id:
-                db.session.add(self)
-            db.session.commit()
-        except SQLAlchemyError as e:
-            print(str(e.__dict__['orig']))
-            return False
-        return True
 
     @staticmethod
     def get_by_numero(numero):
         return Caja.query.filter_by(numero=numero).first()
+
+    @staticmethod
+    def get_grupos():
+        rows = Caja.query.filter_by(estado=1).group_by('grupo').all()
+        grupos = []
+        for r in rows:
+            grupos.append(r.grupo)
+        return grupos
 
 
 class Hub(db.Model):
@@ -107,16 +99,6 @@ class Hub(db.Model):
     fecha_instalacion = db.Column(db.DateTime, nullable=True)
     parametros = db.Column(db.Text, nullable=True)
     estado = db.Column(db.Integer, nullable=False, default=1)
-
-    def save(self):
-        try:
-            if not self.id:
-                db.session.add(self)
-            db.session.commit()
-        except SQLAlchemyError as e:
-            print(str(e.__dict__['orig']))
-            return False
-        return True
 
     @staticmethod
     def get_by_serial(serial):
@@ -134,16 +116,6 @@ class Registro(db.Model):
     def __repr__(self):
         return f'<Registro caja={self.caja}, fecha={self.fecha}, estado={self.estado}>'
 
-    def save(self):
-        try:
-            if not self.id:
-                db.session.add(self)
-            db.session.commit()
-        except SQLAlchemyError as e:
-            print(str(e.__dict__['orig']))
-            return False
-        return True
-
 
 class Evento(db.Model):
     __tablename__ = 'evento'
@@ -157,12 +129,12 @@ class Evento(db.Model):
     def __repr__(self):
         return f'<Registro caja={self.caja}, fecha={self.fecha}, estado={self.estado}>'
 
-    def save(self):
-        try:
-            if not self.id:
-                db.session.add(self)
-            db.session.commit()
-        except SQLAlchemyError as e:
-            print(str(e.__dict__['orig']))
-            return False
-        return True
+
+if __name__ == "__main__":
+    # Para administrar la base de datos
+    # ref: https://programadorwebvalencia.com/tutorial-flask-para-crear-chat-con-socketio-y-vuejs/
+    #
+    # python3 models.py db init
+    # python3 models.py db migrate
+    # python3 models.py db upgrade
+    manager.run()

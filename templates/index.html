@@ -2,48 +2,68 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cashier Calling System v0.1</title>
-    <script src="//code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
-            crossorigin="anonymous"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
-            integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function () {
-            // Use a "/test" namespace.
-            // An application can open a connection on multiple namespaces, and
-            // Socket.IO will multiplex all those connections on a single
-            // physical channel. If you don't care about multiple channels, you
-            // can set the namespace to an empty string.
-            namespace = '/test';
-
-            // Connect to the Socket.IO server.
-            // The connection URL has the following format, relative to the current page:
-            //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io(namespace);
-
-            // Event handler for new connections.
-            // The callback function is invoked when a connection with the
-            // server is established.
-            socket.on('connect', function () {
-                socket.emit('my_event', {data: 'I\'m connected!'});
-            });
-
-            // Event handler for server sent data.
-            // The callback function is invoked whenever the server emits data
-            // to the client. The data is then displayed in the "Received"
-            // section of the page.
-            socket.on('my_response', function (msg, cb) {
-                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.count + ': ' + msg.data).html());
-                if (cb)
-                    cb();
-            });
-        });
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <title>Cashier Calling System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!--
+    <script src="{{ url_for('static', filename='js/fontawesome.5.12.0.min.js') }}"></script>
+    -->
 </head>
 <body>
-<h1>Flask-SocketIO Test</h1>
-<p>Async mode is: <b>{{ async_mode }}</b></p>
-<h2>Receive:</h2>
-<div id="log"></div>
+<div class="container-fluid" id="contenido">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-6">
+                Cashier Calling System
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        {% for g in grupos %}
+            <div class="col-md-{{ grid }}">
+                <div class="card">
+                    <div class="card-header">Fila {{ g }}</div>
+                    <div class="card-body">
+                        <ul class="list-inline">
+                            <li class="list-inline-item">Cajas:</li>
+                            {% for c in cajas %}
+                                {% if c.grupo == g %}
+                                    <li class="list-inline-item">
+                                    <span class="badge badge-primary">
+                                        {{ c.numero }}
+                                    </span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <a href="viewer?grupo={{ g }}" class="btn btn-block btn-light">Visualizar</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div style="padding: 80px">
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    © Copyright {{ anio }}<br>
+    Todos los derechos reservados<br>
+    <div class="text-muted">
+        Desarrollado por
+        <a class="text-muted" href="https://lisoft.net" target="_blank">LISOFT</a> y
+        <a class="text-muted" href="https://avelectronics.cc" target="_blank">AV Electronics</a>.
+        versión {{ version }}
+    </div>
+</footer>
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.slim.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </body>
 </html>
