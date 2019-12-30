@@ -1,0 +1,14 @@
+[Unit]
+Description = Instancia uWSGI para atender a app css-server
+After = network.target
+
+[Service]
+User=pi
+Group=www-data
+WorkingDirectory=/home/pi/ccs-server
+Environment="PATH=/home/pi/ccs-server/venv/bin"
+ExecStart=/usr/local/bin/uwsgi --ini app.ini
+
+[Install]
+WantedBy=multi-user.target
+
