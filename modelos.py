@@ -134,7 +134,7 @@ if __name__ == "__main__":
     # Para administrar la base de datos
     # ref: https://programadorwebvalencia.com/tutorial-flask-para-crear-chat-con-socketio-y-vuejs/
     #
-    # python3 models.py db init
-    # python3 models.py db migrate
-    # python3 models.py db upgrade
+    # python3 modelos.py db init
+    # python3 modelos.py db migrate
+    # python3 modelos.py db upgrade
     manager.run()

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<!--
+#  Copyright (C) Lisoft & AV Electronics - All Rights Reserved
+#  Unauthorized copying of this file, via any medium is strictly prohibited
+#  Proprietary and confidential
+#  Written by Rodrigo Tufiño <rtufino@lisoft.net>, January 2020
+-->
+<html lang="es">
+<head>
+    <title>Cashier Calling System</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta http-equiv="Cache-Control" content="no-store"/>
+    <meta http-equiv="content-type" content="text/html, charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon"/>
+    <script src="{{ url_for('static', filename='js/jquery-1.12.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.io.js') }}"></script>
+</head>
+<body>
+<!-- DIV BOTON DE INICIO -->
+<div id="div-boton" style="text-align:center">
+    <button id="btn-inicio" class="block">Presione aquí para iniciar.</button>
+</div>
+<!-- FIN BOTON -->
+<!-- DIV DE VIDEO -->
+<div id="div-video">
+    <video id="video-01" class="videoBP" width="100%" muted="false" loop="true">
+        <source id="mp4_src"
+                src="{{ url_for('static', filename='video/video01.mp4') }}"
+                type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+    </video>
+</div>
+<!-- FIN VIDEO -->
+<!-- DIV MENSAJE DE LLAMADA A CAJA -->
+<div id="div-mensaje" class="mensaje">
+    <p class="text-caja">
+        Caja
+    </p>
+    <p class="text-numero" id="txt-caja">
+        12
+    </p>
+    <p class="text-flecha" id="txt-flecha">
+        &xlarr;
+    </p>
+</div>
+<!-- FIN MENSAJE -->
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+        // ============================================================================================================
+        // CONSTANTES
+        // ============================================================================================================
+        const namespace = '/calling';                               // Namespace del WebSocket
+        const TIMEOUT = 4;                                          // Tiempo que muestra la llamda a una caja
+        const MI_GRUPO = {{ grupo }};                               // Grupo (fila) del visualizador
+        // ============================================================================================================
+        // VARIABLES
+        // ============================================================================================================
+        let elem = document.documentElement;                        // Obtiene el documento HTML
+        let video = document.getElementById("video-01");            // Obtiene el elemento video
+        let divBoton = document.getElementById("div-boton");        // Obtiene el contenedor del boton de inicio
+        let divVideo = document.getElementById("div-video");        // Obtiene el contenedor del video
+        let divMensaje = document.getElementById("div-mensaje");    // Obtiene el contenedor del mensaje
+        let txtCaja = document.getElementById("txt-caja");          // Obtiene el contenedor del numero del la caja
+        let txtFlecha = document.getElementById("txt-flecha");      // Obtiene el contenedor de la flecha
+        let message = new SpeechSynthesisUtterance();               // Sintetizador de voz
+        let voices = speechSynthesis.getVoices();                   // Vector de voces disponibles
+        let socket = io(namespace);                                 // WebSocket para comunicarse con el servidor
+        let temporizador = 0;                                       // Temporizador para mostrar mensaje
+        // ============================================================================================================
+        // EVENTOS
+        // ============================================================================================================
+        /**
+         * Enlaza el boton de inicio con el evento click.
+         */
+        $("#btn-inicio").click(function (e) {
+            iniciar();
+        });
+        /**
+         * Evento que se emite cuando se establece la conexión con el servidor (cliente -> servidor).
+         */
+        socket.on('connect', function () {
+            socket.emit('navegador_conectado', {data: 'Hi from browser', grupo: MI_GRUPO});
+        });
+        /**
+         * Evento que se emite cuando se establece la conexión con el servidor (servidor -> cliente).
+         */
+        socket.on('servidor_conectado', function (msg, cb) {
+            console.log('Servidor dice:', msg.data);
+            if (cb)
+                cb();
+        });
+        /**
+         * Evento que se emite cuando el servidor llama a una caja.
+         */
+        socket.on('llamar', function (caja, cb) {
+            console.log(caja.numero);
+            visualizar(caja);
+            if (cb)
+                cb();
+        });
+        // ============================================================================================================
+        // FUNCIONES
+        // ============================================================================================================
+        /**
+         * Funcion de inicial. Permite colocar el full-screen y activar audio.
+         */
+        function iniciar() {
+            console.log("iniciar");
+            resize();                                               // Redimensiona a full-screen
+            divBoton.style.display = "none";                        // Oculta el contenedor del boton de inicio
+            video.style.display = "block";                          // Muestra el video
+            video.play();                                           // Reproduce el video
+            inicializarSpeach();
+            inicializarWatchdog();
+        }
+
+        /**
+         * Establece los valores para el sintetizador de voz
+         */
+        function inicializarSpeach() {
+            message.voice = voices[10];
+            message.voiceURI = 'native';
+            message.volume = 1; // 0 to 1
+            message.rate = 1; // 0.1 to 10
+            message.pitch = 1; //0 to 2
+            message.lang = 'es-US';
+        }
+
+        /**
+         * Establece un intervalo a 1 segundo para vigilar el temporizador
+         */
+        function inicializarWatchdog() {
+            setInterval(function () {
+                watchdog();
+            }, 1000, "JavaScript");
+        }
+
+        /**
+         *  Vigila el valor del temporizador para reanudar el video
+         */
+        function watchdog() {
+            if (temporizador === 0 && video.paused) {               // Verifica el temporizador y el video
+                divMensaje.style.display = 'none';                  // Oculta el contenedor del mensaje
+                video.play();                                       // Reanuda el video
+                divVideo.style.display = 'block';                   // Muestra el contenedor del video
+            } else {
+                temporizador--;                                     // Decrementa el temporizador
+            }
+        }
+
+        /**
+         * Redimensiona a full-screen el navegador
+         */
+        function resize() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) {                 // Firefox
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {              // Chrome, Safari & Opera
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {                  // IE/Edge
+                elem.msRequestFullscreen();
+            }
+        }
+
+        /**
+         * Visualiza el llamado a un numero de caja.
+         */
+        function visualizar(caja) {
+            if (caja.grupo === MI_GRUPO) {                          // Verifica si la caja pertenece al grupo
+                message.text = 'Pase a la caja ' + caja.numero;     // Mensaje para reproducir
+                window.speechSynthesis.speak(message);              // Reproduce el mensaje en audio
+                video.pause();                                      // Pausa el video
+                divVideo.style.display = 'none';                    // Oculta el contenedor del video
+                divMensaje.style.display = 'block';                 // Muestra el contenedor del mensaje
+                txtCaja.innerHTML = caja.numero;                    // Establece el numero de caja en el mensaje
+                if (caja.direccion === "D") {                        // Determina la flecha a mostrar
+                    txtFlecha.innerHTML = "&xrarr;";
+                } else if (caja.direccion === "I") {
+                    txtFlecha.innerHTML = "&xlarr;";
+                } else {
+                    txtFlecha.innerHTML = "";
+                }
+                temporizador = TIMEOUT;                             // Establece el valor del temporizador
+            }
+        }
+    });
+</script>
+</body>
+</html>

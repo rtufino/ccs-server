@@ -1,4 +1,22 @@
+/**
+ * Copyright (C) Lisoft & AV Electronics - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Rodrigo Tufiño <rtufino@lisoft.net>, January 2020
+ */
 
+/**
+ * Cargar las fuentes del banco
+ */
+@font-face {
+    font-family: "PreloSlab-SemiBold";
+    src: url("../fonts/PreloSlab-SemiBold.otf");
+    src: url("../fonts/PreloSlab-Bold.otf");
+}
+
+/**
+ * Estilo del pie de pagina
+ */
 footer {
     background-color: #353A3F;
     color: white;
@@ -7,4 +25,79 @@ footer {
     bottom: 0px;
     text-align: center;
     padding: 20px;
+}
+
+/**
+ * Cuerpo del HTML
+ */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/**
+ * Video en loop
+ */
+.videoBP {
+    top: 0;
+    position: absolute;
+    opacity: 0.8;
+    z-index: -1;
+    display: none;
+}
+
+/**
+ * Boton de inicio
+ */
+.block {
+    display: block;
+    width: 100%;
+    border: none;
+    background-color: #ffde00;
+    padding: 40px 28px;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+/**
+ * Mensaje de llamada a cajas
+ */
+.mensaje {
+    display: none;
+    height: 100%;
+    background-color: #ffde00;
+    text-align: center;
+    z-index: 1;
+    font-size: 300px;
+    color: #00215d;
+    text-align: center;
+    font-family: PreloSlab-SemiBold, sans-serif;
+}
+
+/**
+ * Texto "caja"
+ */
+.text-caja{
+    margin: 0;
+    padding-top: 20%;
+    font-size: 100px;
+}
+
+/**
+ * Texto del numero de la caja
+ */
+.text-numero{
+    margin-top: 5%;
+    margin-bottom: 0;
+    padding: 0;
+    font-size: 300pt;
+}
+
+/**
+ * Flecha
+ */
+.text-flecha{
+    margin: 0;
+    font-size: 200px;
+    font-weight: bolder;
 }
