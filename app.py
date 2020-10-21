@@ -23,13 +23,13 @@ from flask_socketio import SocketIO, emit, disconnect
 from modelos import db, Hub, Evento, Caja, Registro
 
 __author__ = 'Rodrigo Tufiño'
-__copyright__ = 'Copyright 2019, Cashier Calling System'
+__copyright__ = 'Copyright 2020, Cashier Calling System'
 __credits__ = ['LISOFT', 'AV Electronics']
 __license__ = 'Privative'
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 __maintainer__ = 'LISOFT'
 __email__ = 'rtufino@lisoft.net'
-__status__ = 'Pro'
+__status__ = 'Dev'
 
 # Cargar archivo de configuracion
 load_dotenv(find_dotenv())
@@ -97,7 +97,7 @@ def viewer():
     :return: Pagina web renderizada
     """
     grupo = request.args['grupo']
-    return render_template('viewer2.html',
+    return render_template('viewer3.html',
                            grupo=grupo)
 
 
