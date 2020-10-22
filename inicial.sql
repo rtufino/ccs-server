@@ -1,0 +1,17 @@
+INSERT INTO db_ccs.banco (id, nombre, estado) VALUES (1, 'Banco Pichincha', 1);
+INSERT INTO db_ccs.tipo_caja (id, banco, nombre, estado) VALUES (1, 1, 'Ventanilla', 1);
+INSERT INTO db_ccs.tipo_caja (id, banco, nombre, estado) VALUES (2, 1, 'Servicios', 1);
+INSERT INTO db_ccs.sucursal (id, banco, nombre, direccion, telefono, estado) VALUES (1, 1, 'CCI', 'Amazonas y NNUU', null, 1);
+INSERT INTO db_ccs.hub (id, serial, fecha_instalacion, parametros, estado) VALUES (1, 'CCS001-001', '2019-12-30 20:00:00', null, 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (1, 1, 2, 1, 1, 'I', 'uno.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (2, 1, 2, 2, 1, 'I', 'dos.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (3, 1, 1, 3, 1, 'I', 'tres.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (4, 1, 1, 4, 1, 'I', 'cuatro.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (5, 1, 1, 5, 1, 'D', 'cinco.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (6, 1, 1, 6, 1, 'D', 'seis.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (7, 1, 1, 7, 1, 'I', 'siete.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (8, 1, 1, 8, 1, 'I', 'ocho.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (9, 1, 1, 9, 1, 'I', 'nueve.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (10, 1, 1, 10, 1, 'D', 'diez.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (11, 1, 1, 11, 1, 'D', 'once.mp3', 1);
+INSERT INTO db_ccs.caja (id, sucursal, tipo_caja, numero, grupo, direccion, audio, estado) VALUES (12, 1, 1, 12, 1, 'D', 'doce.mp3', 1);
