@@ -117,17 +117,6 @@ def registrar():
         abort(400, "Cashier number invalid")
     # Emitir mensaje a WebSocket
     llamar_caja(caja)
-    # Crear el registro
-    registro = Registro(
-        caja=caja.id,
-        fecha=datetime.now(),
-        estado=1
-    )
-    # Agregar a la base de datos
-    db.session.add(registro)
-    # Comprometer datos
-    db.session.commit()
-    print(f"[HUB] Registrada la caja {numero_caja}")
     # Retornar respuesta
     return {"message": "ok"}, 200
 
@@ -182,6 +171,24 @@ def test_message(message):
     print("Cliente conectado [" + ip + "] emite para el grupo", message['grupo'])
     emit('servidor_conectado', {'data': 'Hola. Emites para el grupo ' + str(message['grupo'])})
 
+@socketio.on('llamada_realizada', namespace=NAMESPACE)
+def llamada_realizada(caja):
+    """
+    WebSocket. Recibe un mensaje desde el cliente cuando se ha mostrado en la pantalla
+    :param caja: Número de la caja que ha sido visualizada
+    :return: Mensaje con el numero de grupo para el cual transmite
+    """
+    # Crear el registro
+    registro = Registro(
+        caja=caja['numero'],
+        fecha=datetime.now(),
+        estado=1
+    )
+    # Agregar a la base de datos
+    db.session.add(registro)
+    # Comprometer datos
+    db.session.commit()
+    print(f"[EMIT] Registrada la caja {caja['numero']}")
 
 def llamar_caja(caja):
     """

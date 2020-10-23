@@ -69,7 +69,7 @@
           // CONSTANTES
           // ============================================================================================================
           const namespace = '/calling';                             // Namespace del WebSocket
-          const TIMEOUT = 4;                                        // Tiempo que muestra la llamda a una caja (segundos)
+          const TIMEOUT = 2;                                        // Tiempo que muestra la llamda a una caja (segundos)
           const MI_GRUPO = {{ grupo }};                             // Grupo de cajas para visualizar
           // ============================================================================================================
           // VARIABLES
@@ -83,6 +83,7 @@
           let txtFlecha = document.getElementById("txt-flecha");    // Obtiene el contenedor de la flecha
           let socket = io(namespace);                               // WebSocket para comunicarse con el servidor
           let temporizador = 0;                                     // Temporizador para mostrar mensaje
+          let audio = new Audio('static/audio/uno.mp3');
           // ============================================================================================================
           // Enlaza el click del boton de inicio con el la funcion iniciar.
           // ============================================================================================================
@@ -110,7 +111,6 @@
           // Evento que se emite cuando el servidor llama a una caja.
           // ============================================================================================================
           socket.on('llamar', function(caja, cb) {
-              console.log(caja.numero);
               visualizar(caja);
               if (cb)
                   cb();
@@ -145,6 +145,7 @@
               } else {
                   temporizador--;                                   // Decrementa el temporizador
               }
+              
           }
           // ============================================================================================================
           // Redimensiona a full-screen el navegador
@@ -165,7 +166,7 @@
           // ============================================================================================================
           function visualizar(caja) {
               if (caja.grupo === MI_GRUPO) {                        // Verifica si la caja pertenece al grupo
-                  new Audio("static/audio/" + caja.audio).play();   // Reproduce el audio mp3
+                if (temporizador <= 0){                             // Verifica si no hay otra caja visualizandose
                   video.pause();                                    // Pausa el video
                   divVideo.style.display = 'none';                  // Oculta el contenedor del video
                   divMensaje.style.display = 'block';               // Muestra el contenedor del mensaje
@@ -178,6 +179,12 @@
                       txtFlecha.innerHTML = "";
                   }
                   temporizador = TIMEOUT;                           // Establece el valor del temporizador
+                  audio.src = "static/audio/" + caja.audio;         // Establece el archivo mp3
+                  audio.play();                                     // Reproduce el audio
+                  socket.emit('llamada_realizada', {                // Emite al servidor para registrar en BDD
+                    numero: caja.numero                             // Envía el número de caja visualizado
+                  });
+                }
               }
           }
       });
