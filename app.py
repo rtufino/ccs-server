@@ -64,8 +64,8 @@ def validar_peticion(peticion):
     if not peticion.is_json:
         abort(400, "Invalid request format: application/json")
     try:
-        if peticion.headers['X-Code-Key'] != CODE_KEY:
-            abort(400, "Invalid code key number")
+        # if peticion.headers['X-Code-Key'] != CODE_KEY:
+        #     abort(400, "Invalid code key number")
         if len(peticion.headers['X-Serial']) <= 0:
             abort(400, "No serial number sended")
     except KeyError:
@@ -118,7 +118,7 @@ def registrar():
     # Emitir mensaje a WebSocket
     llamar_caja(caja)
     # Retornar respuesta
-    return {"message": "ok"}, 200
+    return {"caja": numero_caja}, 200
 
 
 @app.route('/api/v1.0/iniciar', methods=['POST'])
